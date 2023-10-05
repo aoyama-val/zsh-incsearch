@@ -2,6 +2,8 @@
 
 Move cursor with incremental search within current line.
 
+![demo](https://github.com/aoyama-val/zsh-incsearch/assets/13144822/210a4b5c-01f7-474b-bdb8-0674a1f29b49)
+
 ## Install (zinit)
 
 ```
