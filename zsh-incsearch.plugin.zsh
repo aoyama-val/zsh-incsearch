@@ -20,8 +20,9 @@ incsearch-backward-beginning() {
 incsearch-enter() {
     incsearch_dir=$1
     incsearch_to_end=$2
-    inbsearch_input=""
+    incsearch_input=""
     incsearch_start=$(( $CURSOR + $incsearch_dir ))
+    incsearch_postdisplay_save="$POSTDISPLAY"
     (( $incsearch_start < 0 )) && incsearch_start=0
     (( $incsearch_start > $#BUFFER - 1 )) && incsearch_start=$(( $#BUFFER - 1 ))
 
@@ -32,14 +33,18 @@ incsearch-enter() {
     zle -N accept-line incsearch-leave
     zle -N backward-delete-char incsearch-backward-delete-char
 
+    incsearch-update-display
+
     for hook in $incsearch_hooks_enter; do
         eval "$hook"
     done
 }
 
 incsearch-leave() {
+    POSTDISPLAY="$incsearch_postdisplay_save"
+    unset incsearch_postdisplay_save
     unset incsearch_dir
-    unset inbsearch_input
+    unset incsearch_input
 
     zle -A saved-self-insert self-insert
     zle -A saved-accept-line accept-line
@@ -54,24 +59,29 @@ incsearch-leave() {
 }
 
 incsearch-self-insert() {
-    inbsearch_input="${inbsearch_input}${KEYS}"
+    incsearch_input="${incsearch_input}${KEYS}"
     incsearch-exec
 }
 
 incsearch-backward-delete-char() {
-    inbsearch_input=${inbsearch_input[1,(($#inbsearch_input - 1))]}
+    incsearch_input=${incsearch_input[1,(($#incsearch_input - 1))]}
     incsearch-exec
 }
 
 incsearch-exec() {
-    INDEX=$(incsearch-index-of "$BUFFER" "$inbsearch_input" "$incsearch_start" "$incsearch_dir")
+    INDEX=$(incsearch-index-of "$BUFFER" "$incsearch_input" "$incsearch_start" "$incsearch_dir")
     if [ $? = 0 ]; then
         if [ $incsearch_to_end = 0 ]; then
             CURSOR=$INDEX
         else
-            CURSOR=$(($INDEX + $#inbsearch_input - 1))
+            CURSOR=$(($INDEX + $#incsearch_input - 1))
         fi
     fi
+    incsearch-update-display
+}
+
+incsearch-update-display() {
+    POSTDISPLAY=$'\n'"search: ${incsearch_input}_"
 }
 
 # From https://github.com/soheilpro/zsh-vi-search/blob/445c8a27dd2ce315176f18b4c7213c848f215675/src/zsh-vi-search.zsh
