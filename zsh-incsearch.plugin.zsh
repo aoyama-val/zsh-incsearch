@@ -22,6 +22,7 @@ incsearch-enter() {
     incsearch_to_end=$2
     incsearch_input=""
     incsearch_start=$(( $CURSOR + $incsearch_dir ))
+    incsearch_postdisplay_save="$POSTDISPLAY"
     (( $incsearch_start < 0 )) && incsearch_start=0
     (( $incsearch_start > $#BUFFER - 1 )) && incsearch_start=$(( $#BUFFER - 1 ))
 
@@ -32,12 +33,16 @@ incsearch-enter() {
     zle -N accept-line incsearch-leave
     zle -N backward-delete-char incsearch-backward-delete-char
 
+    incsearch-update-display
+
     for hook in $incsearch_hooks_enter; do
         eval "$hook"
     done
 }
 
 incsearch-leave() {
+    POSTDISPLAY="$incsearch_postdisplay_save"
+    unset incsearch_postdisplay_save
     unset incsearch_dir
     unset incsearch_input
 
@@ -72,6 +77,11 @@ incsearch-exec() {
             CURSOR=$(($INDEX + $#incsearch_input - 1))
         fi
     fi
+    incsearch-update-display
+}
+
+incsearch-update-display() {
+    POSTDISPLAY=$'\n'"search: ${incsearch_input}_"
 }
 
 # From https://github.com/soheilpro/zsh-vi-search/blob/445c8a27dd2ce315176f18b4c7213c848f215675/src/zsh-vi-search.zsh
