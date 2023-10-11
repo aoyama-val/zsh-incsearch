@@ -20,7 +20,7 @@ incsearch-backward-beginning() {
 incsearch-enter() {
     incsearch_dir=$1
     incsearch_to_end=$2
-    inbsearch_input=""
+    incsearch_input=""
     incsearch_start=$(( $CURSOR + $incsearch_dir ))
     (( $incsearch_start < 0 )) && incsearch_start=0
     (( $incsearch_start > $#BUFFER - 1 )) && incsearch_start=$(( $#BUFFER - 1 ))
@@ -39,7 +39,7 @@ incsearch-enter() {
 
 incsearch-leave() {
     unset incsearch_dir
-    unset inbsearch_input
+    unset incsearch_input
 
     zle -A saved-self-insert self-insert
     zle -A saved-accept-line accept-line
@@ -54,22 +54,22 @@ incsearch-leave() {
 }
 
 incsearch-self-insert() {
-    inbsearch_input="${inbsearch_input}${KEYS}"
+    incsearch_input="${incsearch_input}${KEYS}"
     incsearch-exec
 }
 
 incsearch-backward-delete-char() {
-    inbsearch_input=${inbsearch_input[1,(($#inbsearch_input - 1))]}
+    incsearch_input=${incsearch_input[1,(($#incsearch_input - 1))]}
     incsearch-exec
 }
 
 incsearch-exec() {
-    INDEX=$(incsearch-index-of "$BUFFER" "$inbsearch_input" "$incsearch_start" "$incsearch_dir")
+    INDEX=$(incsearch-index-of "$BUFFER" "$incsearch_input" "$incsearch_start" "$incsearch_dir")
     if [ $? = 0 ]; then
         if [ $incsearch_to_end = 0 ]; then
             CURSOR=$INDEX
         else
-            CURSOR=$(($INDEX + $#inbsearch_input - 1))
+            CURSOR=$(($INDEX + $#incsearch_input - 1))
         fi
     fi
 }
