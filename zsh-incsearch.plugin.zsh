@@ -42,9 +42,11 @@ incsearch-enter() {
 
 incsearch-leave() {
     POSTDISPLAY="$incsearch_postdisplay_save"
-    unset incsearch_postdisplay_save
     unset incsearch_dir
+    unset incsearch_to_end
     unset incsearch_input
+    unset incsearch_start
+    unset incsearch_postdisplay_save
 
     zle -A saved-self-insert self-insert
     zle -A saved-accept-line accept-line
@@ -69,7 +71,7 @@ incsearch-backward-delete-char() {
 }
 
 incsearch-exec() {
-    INDEX=$(incsearch-index-of "$BUFFER" "$incsearch_input" "$incsearch_start" "$incsearch_dir")
+    local INDEX=$(incsearch-index-of "$BUFFER" "$incsearch_input" "$incsearch_start" "$incsearch_dir")
     if [ $? = 0 ]; then
         if [ $incsearch_to_end = 0 ]; then
             CURSOR=$INDEX
@@ -94,6 +96,7 @@ incsearch-index-of() {
     local SUBSTRLEN=${#SUBSTR}
     local START=${3:-0}
     local DIRECTION=${4:-1}
+    local INDEX
 
     [[ $STRLEN -ge 0 ]] || return 1
     [[ $SUBSTRLEN -ge 0 ]] || return 2
