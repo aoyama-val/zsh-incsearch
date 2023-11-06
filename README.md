@@ -2,6 +2,10 @@
 
 Move cursor with incremental search within current line.
 
+**CAVEATS**
+
+This plugin is the reinvention of the zsh's builtin feature `^R` and `^S`. These commands also allow you to move the cursor within the current line, though the name history-incremental-search is not obvious that they has the capability.
+
 ![demo](https://github.com/aoyama-val/zsh-incsearch/assets/13144822/210a4b5c-01f7-474b-bdb8-0674a1f29b49)
 
 ## Install (zinit)
